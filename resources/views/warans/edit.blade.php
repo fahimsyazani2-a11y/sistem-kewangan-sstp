@@ -78,15 +78,49 @@
             font-weight: 700;
             text-transform: uppercase;
         }
+
+        /* Style tambahan untuk row baru */
+        .pecahan-item {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .pecahan-item:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .btn-remove {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid white;
+            font-size: 12px;
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
 
 <div class="container py-5">
-    <div class="col-lg-8 mx-auto">
+    <div class="col-lg-9 mx-auto">
         <div class="card border-0">
             <div class="card-header">
-                <h5 class="mb-0 fw-bold"><i class="fas fa-edit me-2 text-warning"></i>KEMASKINI MAKLUMAT WARAN</h5>
+                <h5 class="mb-0 fw-bold"><i class="fas fa-edit me-2 text-warning"></i>KEMASKINI MAKLUMAT & TAMBAH PECAHAN</h5>
             </div>
             <div class="card-body p-4 p-lg-5">
                 
@@ -113,37 +147,49 @@
                             <label class="form-label">Tujuan / Nama Program (Induk)</label>
                             <textarea name="tujuan" class="form-control" rows="2" required>{{ $waran->tujuan }}</textarea>
                         </div>
-                    </div>
-
-                    <div class="section-title">Perincian Pecahan</div>
-
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-12">
-                            <label class="form-label">Program / Aktiviti</label>
-                            <input type="text" name="program_aktiviti" class="form-control" value="{{ $waran->program_aktiviti }}" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Kod Objek</label>
-                            <input type="text" name="objek" class="form-control" value="{{ $waran->objek }}" required>
-                        </div>
                         <div class="col-md-6">
                             <label class="form-label">Tarikh Terima Waran</label>
                             <input type="date" name="tarikh_terima_waran" class="form-control" value="{{ $waran->tarikh_terima_waran->format('Y-m-d') }}" required>
                         </div>
-                        <div class="col-md-12">
-                            <label class="form-label">Peruntukan (RM)</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light fw-bold">RM</span>
-                                <input type="number" step="0.01" name="peruntukan" class="form-control fw-bold text-primary" value="{{ $waran->peruntukan }}" required>
+                    </div>
+
+                    <div class="section-title">Perincian Pecahan</div>
+
+                    <div id="pecahan-container">
+                        <div class="pecahan-item border-primary">
+                            <span class="badge bg-primary mb-3">Rekod Sedia Ada</span>
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label class="form-label">Program / Aktiviti</label>
+                                    <input type="text" name="program_aktiviti[]" class="form-control" value="{{ $waran->program_aktiviti }}" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Kod Objek</label>
+                                    <input type="text" name="objek[]" class="form-control" value="{{ $waran->objek }}" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Vot</label>
+                                    <input type="text" name="vot[]" class="form-control" value="{{ $waran->vot }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Peruntukan (RM)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light fw-bold" style="font-size: 0.8rem">RM</span>
+                                        <input type="number" step="0.01" name="peruntukan[]" class="form-control fw-bold text-primary" value="{{ $waran->peruntukan }}" required>
+                                    </div>
+                                </div>
                             </div>
-                            <small class="text-muted mt-2 d-block small">Nota: Baki akan dikira semula secara automatik berdasarkan jumlah belanja sedia ada.</small>
                         </div>
                     </div>
+
+                    <button type="button" id="btn-add-pecahan" class="btn btn-outline-success btn-sm fw-bold mt-2 mb-4">
+                        <i class="fas fa-plus-circle me-1"></i> TAMBAH PECAHAN BARU
+                    </button>
 
                     <div class="d-flex justify-content-end gap-2 border-top pt-4 mt-4">
                         <a href="{{ route('admin.dashboard') }}" class="btn btn-light px-4 fw-bold border">BATAL</a>
                         <button type="submit" class="btn btn-primary shadow">
-                            <i class="fas fa-save me-2"></i>KEMASKINI DATA
+                            <i class="fas fa-save me-2"></i> SIMPAN PERUBAHAN
                         </button>
                     </div>
                 </form>
@@ -152,6 +198,41 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('btn-add-pecahan').addEventListener('click', function() {
+        const container = document.getElementById('pecahan-container');
+        const newItem = document.createElement('div');
+        newItem.className = 'pecahan-item';
+        
+        newItem.innerHTML = `
+            <div class="btn-remove" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></div>
+            <span class="badge bg-success mb-3">Pecahan Tambahan</span>
+            <div class="row g-3">
+                <div class="col-md-12">
+                    <label class="form-label">Program / Aktiviti</label>
+                    <input type="text" name="program_aktiviti[]" class="form-control" placeholder="Nama aktiviti baru" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Kod Objek</label>
+                    <input type="text" name="objek[]" class="form-control" placeholder="Contoh: 21000" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Vot</label>
+                    <input type="text" name="vot[]" class="form-control" placeholder="Contoh: B63">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Peruntukan (RM)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light fw-bold" style="font-size: 0.8rem">RM</span>
+                        <input type="number" step="0.01" name="peruntukan[]" class="form-control fw-bold text-success" placeholder="0.00" required>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.appendChild(newItem);
+    });
+</script>
 
 </body>
 </html>

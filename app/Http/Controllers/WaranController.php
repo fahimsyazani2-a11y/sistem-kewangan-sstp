@@ -17,9 +17,9 @@ class WaranController extends Controller
     {
         $query = Waran::with('perbelanjaans')->tersusun();
 
-        // HANYA CARI GUNA NO. OBJEK
         if ($request->has('search') && $request->search != '') {
-            $query->where('objek', 'LIKE', '%' . $request->search . '%');
+            $query->where('objek', 'LIKE', '%' . $request->search . '%')
+                  ->orWhere('program_aktiviti', 'LIKE', '%' . $request->search . '%');
         }
 
         $warans = $query->get();
@@ -34,9 +34,9 @@ class WaranController extends Controller
     {
         $query = Waran::with('perbelanjaans')->tersusun();
 
-        // HANYA CARI GUNA NO. OBJEK
         if ($request->has('search') && $request->search != '') {
-            $query->where('objek', 'LIKE', '%' . $request->search . '%');
+            $query->where('objek', 'LIKE', '%' . $request->search . '%')
+                  ->orWhere('program_aktiviti', 'LIKE', '%' . $request->search . '%');
         }
 
         $warans = $query->get();
@@ -45,7 +45,7 @@ class WaranController extends Controller
     }
 
     /**
-     * SIMPAN WARAN BERKELOMPOK
+     * SIMPAN WARAN BERKELOMPOK (DARI SKRIN CREATE)
      */
     public function store(Request $request)
     {
@@ -65,9 +65,12 @@ class WaranController extends Controller
                 
                 $kodVot = $request->vot[$key];
                 $kodObjek = $request->objek[$key];
+                $namaProgram = $request->program_aktiviti[$key]; // Ambil nama program
                 $amaunInputBaru = (float) $request->peruntukan[$key];
 
+                // FIX LOGIC DISINI: Cari rekod terdahulu yang OBJEK DAN PROGRAM dia sama sebijik
                 $waranTerdahulu = Waran::where('objek', $kodObjek)
+                                    ->where('program_aktiviti', $namaProgram)
                                     ->latest('id')
                                     ->first();
 
@@ -80,7 +83,7 @@ class WaranController extends Controller
                     'tujuan'              => $request->tujuan, 
                     'no_waran'            => $request->no_waran_induk, 
                     'tarikh_terima_waran' => $request->tarikh_terima_waran,
-                    'program_aktiviti'    => $request->program_aktiviti[$key],
+                    'program_aktiviti'    => $namaProgram,
                     'objek'               => $kodObjek,
                     'vot'                 => $kodVot,
                     'amaun_fasa'          => $amaunInputBaru,
@@ -103,35 +106,58 @@ class WaranController extends Controller
     public function update(Request $request, Waran $waran)
     {
         $request->validate([
+            'sektor' => 'required',
             'no_waran' => 'required',
-            'peruntukan' => 'required|numeric',
-            'amaun_fasa' => 'nullable|numeric',
+            'tarikh_terima_waran' => 'required|date',
+            'program_aktiviti.*' => 'required',
+            'objek.*' => 'required',
+            'peruntukan.*' => 'required|numeric',
         ]);
 
-        $total_belanja = $waran->perbelanjaans()->sum('jumlah_keluar');
-        $baki_baru = $request->peruntukan - $total_belanja;
+        DB::transaction(function () use ($request, $waran) {
+            $total_belanja = $waran->perbelanjaans()->sum('jumlah_keluar');
+            $peruntukan_baru = (float)$request->peruntukan[0];
 
-        $waran->update([
-            'sektor'              => $request->sektor,
-            'no_waran'            => $request->no_waran,
-            'tujuan'              => $request->tujuan,
-            'program_aktiviti'    => $request->program_aktiviti,
-            'objek'               => $request->objek,
-            'vot'                 => $request->vot,
-            'amaun_fasa'          => $request->amaun_fasa ?? $waran->amaun_fasa,
-            'peruntukan'          => $request->peruntukan,
-            'jum_belanja'         => $total_belanja,
-            'baki'                => $baki_baru,
-            'tarikh_terima_waran' => $request->tarikh_terima_waran,
-            'pegawai_meja'        => $request->pegawai_meja,
-        ]);
+            $waran->update([
+                'sektor'              => $request->sektor,
+                'no_waran'            => $request->no_waran,
+                'tujuan'              => $request->tujuan,
+                'pegawai_meja'        => $request->pegawai_meja,
+                'tarikh_terima_waran' => $request->tarikh_terima_waran,
+                'program_aktiviti'    => $request->program_aktiviti[0],
+                'objek'               => $request->objek[0],
+                'vot'                 => $request->vot[0] ?? $waran->vot,
+                'peruntukan'          => $peruntukan_baru,
+                'jum_belanja'         => $total_belanja,
+                'baki'                => $peruntukan_baru - $total_belanja,
+            ]);
+
+            if (count($request->program_aktiviti) > 1) {
+                foreach ($request->program_aktiviti as $key => $value) {
+                    if ($key == 0) continue; 
+
+                    Waran::create([
+                        'sektor'              => $request->sektor,
+                        'no_waran'            => $request->no_waran,
+                        'pegawai_meja'        => $request->pegawai_meja,
+                        'tujuan'              => $request->tujuan,
+                        'tarikh_terima_waran' => $request->tarikh_terima_waran,
+                        'program_aktiviti'    => $request->program_aktiviti[$key],
+                        'objek'               => $request->objek[$key],
+                        'vot'                 => $request->vot[$key] ?? null,
+                        'amaun_fasa'          => $request->peruntukan[$key],
+                        'peruntukan'          => $request->peruntukan[$key],
+                        'jum_belanja'         => 0,
+                        'baki'                => $request->peruntukan[$key],
+                        'catatan_agihan'      => "Pecahan Tambahan (Sistem)",
+                    ]);
+                }
+            }
+        });
 
         return redirect()->route('admin.dashboard')->with('success', 'Data Berjaya Dikemaskini!');
     }
 
-    /**
-     * PADAM WARAN
-     */
     public function destroy(Waran $waran)
     {
         DB::transaction(function () use ($waran) {

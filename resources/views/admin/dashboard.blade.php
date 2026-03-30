@@ -5,368 +5,326 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SSTP JPN PERAK | Admin Dashboard</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --bg-body: #f4f7fa;
+            --bg-body: #f8fafc;
             --primary: #2563eb;
-            --accent: #3b82f6;
-            --purple: #6366f1;
-            --dark: #0f172a;
+            --success-bg: #dcfce7;
+            --success-text: #166534;
             --border-color: #e2e8f0;
         }
 
         body { 
             background-color: var(--bg-body); 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            color: #334155;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            font-size: 0.85rem; 
+            color: #475569;
         }
 
+        .container-fluid { padding: 0 40px !important; }
+
         .admin-header {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            padding: 1rem 0;
+            background: white;
+            padding: 15px 0;
             border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            margin-bottom: 20px;
+        }
+
+        .btn-custom {
+            font-weight: 700;
+            font-size: 0.75rem;
+            border-radius: 20px;
+            padding: 8px 20px;
+            text-transform: uppercase;
         }
 
         .search-card {
             background: white;
-            border-radius: 16px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            margin-top: -20px;
+            border-radius: 50px;
+            max-width: 650px;
+            margin: 0 auto 30px auto;
+            display: flex;
+            align-items: center;
+            padding: 4px 6px 4px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .search-card input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 0.9rem;
+            background: transparent;
+        }
+
+        .btn-cari {
+            background: #1e293b;
+            color: white;
+            border-radius: 25px;
+            padding: 7px 35px;
+            font-weight: 800;
+            border: none;
         }
 
         .table-container {
-            background: #ffffff;
-            border-radius: 20px;
+            background: white;
             border: 1px solid var(--border-color);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
             overflow: hidden;
-            margin-bottom: 3rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
 
         .table thead th {
-            background-color: #f8fafc !important;
+            background-color: #f1f5f9 !important;
             color: #64748b !important;
+            font-size: 0.7rem;
             font-weight: 700;
-            font-size: 0.75rem;
             text-transform: uppercase;
-            padding: 1.2rem !important;
-            letter-spacing: 0.5px;
-        }
-
-        .col-merged {
-            background-color: #ffffff;
-            vertical-align: middle !important;
-            border-right: 1px solid #f8fafc;
+            padding: 15px !important;
+            border: none;
         }
 
         .sektor-tag {
             background: #eff6ff;
-            color: #2563eb;
-            font-size: 0.65rem;
-            font-weight: 800;
-            padding: 5px 10px;
-            border-radius: 8px;
+            color: #3b82f6;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 6px;
             display: inline-block;
             margin-bottom: 10px;
             border: 1px solid #dbeafe;
         }
 
         .waran-text {
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             font-weight: 800;
-            color: var(--dark);
-            margin-bottom: 0;
-        }
-
-        .vot-tag {
-            background: #f8fafc;
-            color: #475569;
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-            display: inline-block;
-        }
-
-        .objek-label {
-            font-size: 0.85rem;
-            font-weight: 800;
-            color: var(--primary);
-            display: block;
-            margin-bottom: 2px;
-        }
-
-        .prog-label {
-            font-size: 0.85rem;
-            font-weight: 800;
-            color: var(--purple);
-            display: block;
-            margin-bottom: 2px;
+            color: #1e293b;
+            margin-bottom: 5px;
         }
 
         .label-mini {
-            font-size: 0.6rem;
-            font-weight: 800;
+            font-size: 0.55rem;
+            font-weight: 700;
             color: #94a3b8;
-            display: block;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            display: block;
         }
 
+        .val-blue { color: #3b82f6; font-weight: 700; font-size: 0.85rem; }
+        .val-purple { color: #6366f1; font-weight: 700; font-size: 0.85rem; }
+
         .fasa-box {
-            background: #ffffff;
             border: 1px solid #f1f5f9;
-            border-radius: 12px;
-            padding: 12px;
-            margin: 8px auto;
-            max-width: 200px;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            border-radius: 8px;
+            padding: 10px;
+            background: #fff;
+            margin-top: 10px;
+            max-width: 180px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .baki-pill {
+            background: var(--success-bg);
+            color: var(--success-text);
             padding: 8px 16px;
-            border-radius: 12px;
+            border-radius: 8px;
+            font-weight: 700;
             font-size: 0.85rem;
-            font-weight: 800;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
-        .status-pos { background: #dcfce7; color: #166534; }
-        .status-neg { background: #fee2e2; color: #991b1b; }
 
         .btn-action {
-            width: 36px; height: 36px;
-            display: inline-flex; align-items: center; justify-content: center;
-            border-radius: 10px; transition: all 0.2s;
-            border: none; margin: 0 2px;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white !important;
+            text-decoration: none;
+            font-size: 0.8rem;
+            border: none;
+            margin: 0 2px;
         }
-        .btn-add { background: #2563eb; color: white; }
-        .btn-edit { background: #f59e0b; color: white; }
-        .btn-del { background: #ef4444; color: white; }
-        .btn-action:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); color: white; }
+
+        .btn-add { background: #3b82f6; }
+        .btn-edit { background: #f59e0b; }
+        .btn-delete { background: #ef4444; }
 
         .belanja-item {
-            display: flex; justify-content: space-between; align-items: center;
-            font-size: 0.75rem; background: #f8fafc;
-            padding: 8px 12px; border-radius: 8px;
-            margin-bottom: 6px; border: 1px solid #f1f5f9;
+            font-size: 0.75rem;
+            background: #f8fafc;
+            padding: 6px 12px;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid #f1f5f9;
         }
-        .belanja-action-link {
-            color: #94a3b8; margin-left: 8px; transition: 0.2s;
-            background: none; border: none; padding: 0;
-        }
-        .belanja-action-link:hover { color: #f59e0b; }
-        .btn-delete-belanja:hover { color: #ef4444 !important; }
 
-        footer {
-            background: white; border-top: 1px solid var(--border-color);
-            padding: 2rem 0; margin-top: auto;
+        .td-merged {
+            vertical-align: middle !important;
+            border-right: 1px solid var(--border-color) !important;
         }
     </style>
 </head>
 <body>
 
 <div class="admin-header">
-    <div class="container-fluid d-flex justify-content-between align-items-center px-4">
-        <div class="d-flex align-items-center">
-            <img src="{{ asset('images/logo_sstp.jpeg') }}" height="50" class="me-3 rounded shadow-sm">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-3">
+            <img src="{{ asset('images/logo_sstp.jpeg') }}" height="45">
             <div>
-                <h5 class="fw-bold mb-0">ADMIN DASHBOARD</h5>
-                <small class="text-primary fw-bold" style="font-size: 0.7rem; letter-spacing: 1px;">SSTP JPN PERAK</small>
+                <h5 class="fw-800 mb-0">ADMIN DASHBOARD</h5>
+                <span class="text-primary fw-bold" style="font-size: 0.7rem;">SSTP JPN PERAK</span>
             </div>
         </div>
-        <div class="d-flex gap-3">
-            <a href="{{ route('warans.export') }}" class="btn btn-outline-success btn-sm rounded-pill px-4 fw-bold">
-                <i class="fas fa-file-excel me-2"></i> EXCEL
-            </a>
-            <a href="{{ route('warans.create') }}" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow">
-                <i class="fas fa-plus-circle me-2"></i> TAMBAH WARAN
-            </a>
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <button type="submit" class="btn btn-light btn-sm rounded-pill px-4 fw-bold border">LOGOUT</button>
-            </form>
+        <div class="d-flex gap-2">
+            <a href="{{ route('warans.export') }}" class="btn btn-outline-success btn-custom"><i class="fas fa-file-excel me-1"></i> Excel</a>
+            <a href="{{ route('warans.create') }}" class="btn btn-primary btn-custom shadow-sm"><i class="fas fa-plus me-1"></i> Tambah Waran</a>
+            <form action="{{ route('logout') }}" method="POST">@csrf <button class="btn btn-light btn-custom border">Logout</button></form>
         </div>
     </div>
 </div>
 
-<div class="container-fluid px-4 mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6 text-center">
-            <div class="search-card p-2">
-                <form action="{{ url()->current() }}" method="GET" class="d-flex gap-2">
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent border-0 text-muted"><i class="fas fa-search"></i></span>
-                        <input type="text" name="search" class="form-control border-0 shadow-none" 
-                               placeholder="Cari No. Objek..." value="{{ request('search') }}">
-                    </div>
-                    <button type="submit" class="btn btn-dark rounded-pill px-4 fw-bold">CARI</button>
-                </form>
-            </div>
-            
-            @if(request('search'))
-                <div class="mt-3">
-                    <a href="{{ route('admin.dashboard') }}" class="btn btn-link text-decoration-none text-muted small fw-bold">
-                        <i class="fas fa-arrow-left me-1"></i> Kembali ke Senarai Penuh
-                    </a>
-                </div>
-            @endif
-        </div>
+<div class="container-fluid">
+    <div class="search-card">
+        <i class="fas fa-search text-muted me-2"></i>
+        <input type="text" id="liveSearchInput" placeholder="Cari No. Objek atau Program Aktiviti...">
+        <button class="btn-cari">CARI</button>
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success border-0 shadow-sm rounded-4 mt-4">
-            <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-        </div>
+    <div class="alert alert-success border-0 shadow-sm mb-4 rounded-3">
+        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+    </div>
     @endif
 
-    <div class="table-container mt-5">
-        <div class="table-responsive">
-            <table class="table align-middle mb-0 text-center">
-                <thead>
-                    <tr>
-                        <th style="width: 15%">Sektor & No. Waran</th>
-                        <th style="width: 20%">Butiran Program</th>
-                        <th style="width: 18%">Maklumat Kewangan</th>
-                        <th style="width: 12%">Baki Semasa</th>
-                        <th style="width: 22%">Perbelanjaan</th>
-                        <th style="width: 13%">Tindakan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @php $groupedWarans = $warans->groupBy('no_waran'); @endphp
+    <div class="table-container">
+        <table class="table align-middle mb-0 text-center">
+            <thead>
+                <tr>
+                    <th style="width: 15%">Sektor & No. Waran</th>
+                    <th style="width: 20%">Butiran Program</th>
+                    <th style="width: 20%">Maklumat Kewangan</th>
+                    <th style="width: 15%">Baki Semasa</th>
+                    <th style="width: 20%">Perbelanjaan</th>
+                    <th style="width: 10%">Tindakan</th>
+                </tr>
+            </thead>
+            <tbody id="waranTableBody">
+                @php
+                    // Kita group ikut No Waran DAN Tujuan (Butiran Program)
+                    // Supaya kalau No Waran sama tapi butiran lain, dia takkan merge.
+                    $groupedWarans = $warans->groupBy(function($item) {
+                        return $item->no_waran . '___' . $item->tujuan;
+                    });
+                @endphp
 
-                    @forelse($groupedWarans as $noWaran => $rows)
-                        @foreach($rows as $index => $waran)
-                        <tr>
+                @forelse($groupedWarans as $key => $items)
+                    @foreach($items as $index => $waran)
+                        @php
+                            $bakiSemasa = (float)$waran->peruntukan - $waran->perbelanjaans->sum('jumlah_keluar');
+                        @endphp
+                        
+                        <tr class="waran-row">
                             @if($index === 0)
-                                <td rowspan="{{ count($rows) }}" class="col-merged px-4">
-                                    <span class="sektor-tag">{{ $waran->sektor }}</span>
+                                <td class="bg-white border-bottom py-4 td-merged" rowspan="{{ count($items) }}">
+                                    <span class="sektor-tag">SSTP JPN PERAK</span>
                                     <div class="waran-text">{{ $waran->no_waran }}</div>
-                                    <div class="text-muted small mt-1">
-                                        <i class="far fa-calendar-alt me-1"></i>
-                                        {{ $waran->tarikh_terima_waran ? \Carbon\Carbon::parse($waran->tarikh_terima_waran)->format('d/m/Y') : '-' }}
+                                    <div class="small text-muted fw-bold">
+                                        <i class="far fa-calendar me-1"></i> {{ $waran->created_at->format('d/m/Y') }}
                                     </div>
                                 </td>
-                                <td rowspan="{{ count($rows) }}" class="col-merged text-start px-4">
-                                    <div class="fw-bold text-dark mb-1" style="font-size: 0.85rem;">{{ $waran->tujuan }}</div>
-                                    <div class="d-flex align-items-center gap-2" style="font-size: 0.7rem;">
-                                        <i class="fas fa-user-circle text-primary"></i>
-                                        <span class="fw-semibold text-muted">{{ $waran->pegawai_meja ?? 'SSTP' }}</span>
+
+                                <td class="bg-white border-bottom text-start px-4 td-merged" rowspan="{{ count($items) }}">
+                                    <div class="fw-bold text-dark mb-2" style="line-height: 1.4;">{{ $waran->tujuan }}</div>
+                                    <div class="text-primary fw-bold small">
+                                        <i class="fas fa-user-circle me-1"></i> {{ $waran->pegawai_meja ?? 'ADMIN' }}
                                     </div>
                                 </td>
                             @endif
 
-                            <td class="py-4 border-start bg-white">
+                            <td class="bg-white border-bottom py-3">
                                 <div class="mb-2">
                                     <span class="label-mini">OBJEK:</span>
-                                    <strong class="objek-label">{{ $waran->objek }}</strong>
+                                    <span class="val-blue search-target-objek">{{ $waran->objek }}</span>
                                 </div>
-
                                 <div class="mb-2">
                                     <span class="label-mini">PROG/AKT:</span>
-                                    <strong class="prog-label">{{ $waran->program_aktiviti }}</strong>
+                                    <span class="val-purple search-target-prog">{{ $waran->program_aktiviti }}</span>
                                 </div>
-
-                                <div class="vot-tag mb-2">VOT: {{ $waran->vot ?? '-' }}</div>
+                                <div class="badge bg-light text-dark border fw-bold mb-2" style="font-size: 0.65rem;">VOT: {{ $waran->vot ?? 'B63' }}</div>
                                 
-                                <div class="fasa-box">
-                                    <div class="d-flex justify-content-between small mb-1">
-                                        <span class="text-muted fw-bold" style="font-size: 0.6rem;">AGIHAN</span>
+                                <div class="fasa-box text-start">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="label-mini">AGIHAN</span>
                                         <span class="fw-bold">RM {{ number_format($waran->amaun_fasa, 2) }}</span>
                                     </div>
-                                    <div style="border-top: 1px solid #f1f5f9; margin: 6px 0;"></div>
-                                    <div class="d-flex justify-content-between">
-                                        <span class="text-primary fw-bold" style="font-size: 0.6rem;">TOTAL</span>
+                                    <div class="d-flex justify-content-between border-top pt-1">
+                                        <span class="label-mini text-primary">TOTAL</span>
                                         <span class="fw-bold text-primary">RM {{ number_format($waran->peruntukan, 2) }}</span>
                                     </div>
                                 </div>
                             </td>
 
-                            <td class="bg-white">
-                                <div class="baki-pill {{ $waran->baki < 0 ? 'status-neg' : 'status-pos' }}">
-                                    @if($waran->baki < 0) <i class="fas fa-exclamation-triangle"></i> @else <i class="fas fa-wallet"></i> @endif
-                                    RM {{ number_format($waran->baki, 2) }}
+                            <td class="bg-white border-bottom">
+                                <div class="baki-pill {{ $bakiSemasa < 0 ? 'bg-danger text-white' : '' }}">
+                                    <i class="fas fa-wallet"></i> RM {{ number_format($bakiSemasa, 2) }}
                                 </div>
                             </td>
 
-                            <td class="px-3 text-start bg-white">
+                            <td class="bg-white border-bottom px-3 text-start">
                                 @forelse($waran->perbelanjaans as $belanja)
                                     <div class="belanja-item">
-                                        <div class="text-truncate" style="max-width: 130px;">
-                                            <i class="fas fa-tag text-muted me-1"></i>{{ $belanja->butiran }}
-                                        </div>
-                                        <div class="d-flex align-items-center gap-1">
-                                            <span class="text-danger fw-bold">-{{ number_format($belanja->jumlah_keluar, 2) }}</span>
-                                            
-                                            <a href="{{ route('perbelanjaan.edit', $belanja->id) }}" class="belanja-action-link" title="Edit Belanja">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-
-                                            <form action="{{ route('perbelanjaan.destroy', $belanja->id) }}" method="POST" onsubmit="return confirm('Padam rekod belanja ini?')" style="display:inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="belanja-action-link btn-delete-belanja" title="Padam Belanja">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
-                                            </form>
-                                        </div>
+                                        <span>{{ $belanja->butiran }}</span>
+                                        <span class="text-danger fw-bold">-{{ number_format($belanja->jumlah_keluar, 2) }}</span>
                                     </div>
                                 @empty
-                                    <div class="text-center py-2 opacity-50 small italic">Tiada rekod belanja</div>
+                                    <span class="text-muted small italic">Tiada rekod belanja</span>
                                 @endforelse
                             </td>
 
-                            <td class="bg-white">
+                            <td class="bg-white border-bottom">
                                 <div class="d-flex justify-content-center">
-                                    <a href="{{ route('perbelanjaan.create', ['waran_id' => $waran->id]) }}" class="btn-action btn-add" title="Tambah Belanja">
-                                        <i class="fas fa-plus"></i>
-                                    </a>
-                                    <a href="{{ route('warans.edit', $waran->id) }}" class="btn-action btn-edit" title="Edit Waran">
-                                        <i class="fas fa-pencil-alt"></i>
-                                    </a>
-                                    <form action="{{ route('warans.destroy', $waran->id) }}" method="POST" onsubmit="return confirm('Padam rekod waran ini?')">
+                                    <a href="{{ route('perbelanjaan.create', ['waran_id' => $waran->id]) }}" class="btn-action btn-add" title="Tambah Belanja"><i class="fas fa-plus"></i></a>
+                                    <a href="{{ route('warans.edit', $waran->id) }}" class="btn-action btn-edit" title="Edit"><i class="fas fa-pencil-alt"></i></a>
+                                    <form action="{{ route('warans.destroy', $waran->id) }}" method="POST" style="display:inline;">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="btn-action btn-del" title="Padam Waran"><i class="fas fa-trash-alt"></i></button>
+                                        <button class="btn-action btn-delete" onclick="return confirm('Hapus rekod ini?')"><i class="fas fa-trash"></i></button>
                                     </form>
                                 </div>
                             </td>
                         </tr>
-                        @endforeach
-                    @empty
-                        <tr>
-                            <td colspan="6" class="py-5 text-muted">
-                                <p class="fw-bold">Tiada data dijumpai.</p>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                    @endforeach
+                @empty
+                    <tr><td colspan="6" class="py-5 text-muted">Data tidak dijumpai.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
 </div>
 
-<footer>
-    <div class="container text-center">
-        <h6 class="fw-bold mb-1">WARAN PERUNTUKAN</h6>
-        <p class="text-muted small mb-0">Sektor Sumber Teknologi Pendidikan (SSTP)</p>
-        <p class="text-muted" style="font-size: 0.7rem;">JPN Perak &copy; {{ date('Y') }}</p>
-    </div>
-</footer>
+<script>
+    document.getElementById('liveSearchInput').addEventListener('keyup', function() {
+        let searchValue = this.value.toLowerCase();
+        let rows = document.querySelectorAll('.waran-row');
+
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(searchValue) ? "" : "none";
+        });
+    });
+</script>
 
 </body>
 </html>
