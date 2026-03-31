@@ -4,18 +4,16 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WaranController;
 use App\Http\Controllers\PerbelanjaanController;
 use App\Http\Controllers\AuthController;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
 | 1. LALUAN AWAM / STAFF
 |--------------------------------------------------------------------------
 */
-// Halaman utama semakan
 Route::get('/', [WaranController::class, 'index'])->name('warans.index');
-
-// Route Export diletakkan di luar supaya tidak kacau laluan Admin
 Route::get('/warans/export', [WaranController::class, 'export'])->name('warans.export');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -24,8 +22,7 @@ Route::get('/warans/export', [WaranController::class, 'export'])->name('warans.e
 */
 Route::prefix('urus-setia-sstp')->group(function () {
 
-    // --- A. LALUAN LOGIN (MESTI DI ATAS) ---
-    // Letakkan login di bahagian paling atas prefix supaya tidak bertembung dengan resource
+    // --- A. LALUAN LOGIN ---
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -33,7 +30,6 @@ Route::prefix('urus-setia-sstp')->group(function () {
     // --- B. LALUAN YANG MEMERLUKAN AUTH ---
     Route::middleware(['auth'])->group(function () {
         
-        // Dashboard Admin
         Route::get('/dashboard', [WaranController::class, 'adminDashboard'])->name('admin.dashboard');
 
         // --- C. PENGURUSAN PERBELANJAAN ---
@@ -43,9 +39,25 @@ Route::prefix('urus-setia-sstp')->group(function () {
         Route::put('/perbelanjaan/update/{id}', [PerbelanjaanController::class, 'update'])->name('perbelanjaan.update');
         Route::delete('/perbelanjaan/padam/{id}', [PerbelanjaanController::class, 'destroy'])->name('perbelanjaan.destroy');
 
-        // --- D. PENGURUSAN WARAN (MESTI DI BAWAH SEKALI) ---
-        // Resource diletakkan di bawah sekali supaya perkataan 'login' atau 'dashboard' 
-        // tidak dianggap sebagai ID waran.
+        // --- D. PENGURUSAN WARAN ---
         Route::resource('warans', WaranController::class)->except(['index', 'show']);
     });
+});
+
+/*
+|--------------------------------------------------------------------------
+| 3. LALUAN RESET PASSWORD (PAKSA)
+|--------------------------------------------------------------------------
+*/
+Route::get('/paksa-reset-password', function () {
+    $user = User::where('email', 'jpnperak.sstp@moe.gov.my')->first();
+
+    if ($user) {
+        $user->update([
+            'password' => Hash::make('Maizatul@8680')
+        ]);
+        return "Berjaya! Password sekarang: Maizatul@8680. Sila cuba login.";
+    }
+
+    return "User tak jumpa dalam database!";
 });
