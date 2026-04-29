@@ -163,17 +163,30 @@
         .belanja-item {
             font-size: 0.75rem;
             background: #f8fafc;
-            padding: 6px 12px;
-            border-radius: 6px;
-            margin-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 6px;
             border: 1px solid #f1f5f9;
+            transition: all 0.2s;
+        }
+        
+        .belanja-item:hover {
+            border-color: #cbd5e1;
+            background: #f1f5f9;
         }
 
         .td-merged {
             vertical-align: middle !important;
             border-right: 1px solid var(--border-color) !important;
+        }
+
+        .btn-mini-action {
+            padding: 2px 5px;
+            font-size: 0.7rem;
+            border-radius: 4px;
+            text-decoration: none;
+            background: transparent;
+            border: none;
         }
     </style>
 </head>
@@ -217,14 +230,12 @@
                     <th style="width: 20%">Butiran Program</th>
                     <th style="width: 20%">Maklumat Kewangan</th>
                     <th style="width: 15%">Baki Semasa</th>
-                    <th style="width: 20%">Perbelanjaan</th>
-                    <th style="width: 10%">Tindakan</th>
+                    <th style="width: 20%">Perbelanjaan (Item)</th>
+                    <th style="width: 10%">Tindakan Waran</th>
                 </tr>
             </thead>
             <tbody id="waranTableBody">
                 @php
-                    // Kita group ikut No Waran DAN Tujuan (Butiran Program)
-                    // Supaya kalau No Waran sama tapi butiran lain, dia takkan merge.
                     $groupedWarans = $warans->groupBy(function($item) {
                         return $item->no_waran . '___' . $item->tujuan;
                     });
@@ -285,9 +296,25 @@
 
                             <td class="bg-white border-bottom px-3 text-start">
                                 @forelse($waran->perbelanjaans as $belanja)
-                                    <div class="belanja-item">
-                                        <span>{{ $belanja->butiran }}</span>
-                                        <span class="text-danger fw-bold">-{{ number_format($belanja->jumlah_keluar, 2) }}</span>
+                                    <div class="belanja-item d-flex justify-content-between align-items-center">
+                                        <div style="flex: 1;">
+                                            <span class="fw-bold d-block text-dark">{{ $belanja->butiran }}</span>
+                                            <span class="text-danger fw-bold" style="font-size: 0.7rem;">-RM {{ number_format($belanja->jumlah_keluar, 2) }}</span>
+                                        </div>
+                                        
+                                        <div class="d-flex gap-1 ms-2">
+                                            <a href="{{ route('perbelanjaan.edit', $belanja->id) }}" class="btn-mini-action text-warning" title="Edit Belanja">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </a>
+                                            
+                                            <form action="{{ route('perbelanjaan.destroy', $belanja->id) }}" method="POST" onsubmit="return confirm('Hapus rekod belanja ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn-mini-action text-danger" title="Padam Belanja">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 @empty
                                     <span class="text-muted small italic">Tiada rekod belanja</span>
@@ -297,10 +324,10 @@
                             <td class="bg-white border-bottom">
                                 <div class="d-flex justify-content-center">
                                     <a href="{{ route('perbelanjaan.create', ['waran_id' => $waran->id]) }}" class="btn-action btn-add" title="Tambah Belanja"><i class="fas fa-plus"></i></a>
-                                    <a href="{{ route('warans.edit', $waran->id) }}" class="btn-action btn-edit" title="Edit"><i class="fas fa-pencil-alt"></i></a>
+                                    <a href="{{ route('warans.edit', $waran->id) }}" class="btn-action btn-edit" title="Edit Waran"><i class="fas fa-pencil-alt"></i></a>
                                     <form action="{{ route('warans.destroy', $waran->id) }}" method="POST" style="display:inline;">
                                         @csrf @method('DELETE')
-                                        <button class="btn-action btn-delete" onclick="return confirm('Hapus rekod ini?')"><i class="fas fa-trash"></i></button>
+                                        <button class="btn-action btn-delete" onclick="return confirm('Hapus rekod waran ini?')"><i class="fas fa-trash"></i></button>
                                     </form>
                                 </div>
                             </td>
